@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VetAsistan</title>
+<style>
+:root{--teal:#0f766e;--pale:#ccfbf1;--bg:#f0fdfa;--ink:#1e293b;--red:#b91c1c;--orange:#c2410c;--green:#15803d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px system-ui,sans-serif}
+header{background:linear-gradient(135deg,#0f766e,#14b8a6);color:white;text-align:center;padding:22px 12px}
+header h1{margin:0}header p{margin:6px 0 0}
+nav{position:sticky;top:0;background:white;padding:10px;display:flex;gap:7px;justify-content:center;flex-wrap:wrap;box-shadow:0 2px 8px #0001;z-index:2}
+button{cursor:pointer;border:0;border-radius:9px;padding:10px 14px;font-weight:650}
+nav button{background:var(--pale);color:var(--teal)}nav button.active,.primary{background:var(--teal);color:white}
+main{max-width:900px;margin:20px auto;padding:0 14px}.tab{display:none}.tab.active{display:block}
+.card{background:white;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 2px 10px #0000000d}
+h2{color:var(--teal);margin:0 0 12px}.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+label{display:block;font-weight:600;margin:10px 0 5px}input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:7px}
+.checks label{margin:0;padding:9px;background:#f8fafc;border-radius:8px;font-weight:400}
+.checks input{width:auto;margin-right:7px}
+.notice{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px;border-radius:8px;margin-bottom:14px}
+.result{padding:14px;border-radius:10px;margin-top:14px;color:white}.urgent{background:var(--red)}.soon{background:var(--orange)}.monitor{background:var(--green)}
+.list{padding-left:20px}.item{padding:10px;background:#f8fafc;border-radius:8px;margin:7px 0}
+#chat{height:300px;overflow:auto;background:#f8fafc;border-radius:9px;padding:12px;margin:10px 0}
+.msg{padding:9px 12px;border-radius:10px;margin:7px 0;white-space:pre-wrap}
+.user{background:var(--teal);color:white;margin-left:15%}.bot{background:white;border:1px solid #e2e8f0;margin-right:10%}
+.small{font-size:.88rem;color:#64748b}footer{text-align:center;color:#64748b;padding:20px}
+</style>
+</head>
+<body>
+<header><h1>🐾 VetAsistan</h1><p>Evcil hayvanınız için sağlık ve bakım yardımcısı</p></header>
+
+<nav>
+  <button class="active" data-tab="profil">🐶 Profil</button>
+  <button data-tab="belirti">🚨 Belirti kontrolü</button>
+  <button data-tab="zehir">☠️ Zehir kontrolü</button>
+  <button data-tab="asi">💉 Aşı takvimi</button>
+  <button data-tab="asistan">🤖 Asistan</button>
+</nav>
+
+<main>
+<div class="notice">⚠️ Bu uygulama veteriner muayenesinin yerini tutmaz. Nefes almada güçlük, bayılma, nöbet, yoğun kanama veya zehirlenme şüphesinde vakit kaybetmeden veteriner kliniğini arayın.</div>
+
+<section id="profil" class="tab active">
+  <div class="card">
+    <h2>Evcil hayvan profili</h2>
+    <div class="row">
+      <div><label>Adı</label><input id="ad" placeholder="Pamuk"></div>
+      <div><label>Türü</label><select id="tur"><option>Köpek</option><option>Kedi</option><option>Tavşan</option><option>Kuş</option><option>Diğer</option></select></div>
+      <div><label>Irkı</label><input id="irk" placeholder="Varsa"></div>
+      <div><label>Yaşı (yıl)</label><input id="yas" type="number" min="0" step=".1"></div>
+      <div><label>Kilosu (kg)</label><input id="kilo" type="number" min="0" step=".1"></div>
+      <div><label>Cinsiyeti</label><select id="cins"><option>Belirtilmedi</option><option>Dişi</option><option>Erkek</option></select></div>
+    </div>
+    <label>Bilinen hastalıklar veya kullandığı ilaçlar</label><textarea id="notlar" rows="3"></textarea>
+    <button class="primary" onclick="saveProfile()">Profili kaydet</button>
+    <span id="saved" class="small"></span>
+  </div>
+</section>
+
+<section id="belirti" class="tab">
+  <div class="card">
+    <h2>Belirti kontrolü</h2>
+    <p class="small">Bu kontrol tanı koymaz; yalnızca ne kadar hızlı yardım aramanız gerektiğine dair genel uyarı verir.</p>
+    <div class="checks" id="symptoms">
+      <label><input type="checkbox" value="Nefes almada güçlük">Nefes almada güçlük</label>
+      <label><input type="checkbox" value="Bayılma veya tepki vermeme">Bayılma / tepki vermeme</label>
+      <label><input type="checkbox" value="Nöbet">Nöbet</label>
+      <label><input type="checkbox" value="Yoğun kanama">Yoğun kanama</label>
+      <label><input type="checkbox" value="Zehirli madde yutma şüphesi">Zehirli madde yutma şüphesi</label>
+      <label><input type="checkbox" value="Tekrarlayan kusma">Tekrarlayan kusma</label>
+      <label><input type="checkbox" value="İshal">İshal</label>
+      <label><input type="checkbox" value="İştahsızlık">İştahsızlık</label>
+      <label><input type="checkbox" value="Halsizlik">Halsizlik</label>
+      <label><input type="checkbox" value="Topallama veya ağrı">Topallama / ağrı</label>
+    </div>
+    <label>Belirtiler ne zamandır var?</label>
+    <input id="sure" placeholder="Örn. Bu sabahtan beri">
+    <button class="primary" onclick="checkSymptoms()">Değerlendir</button>
+    <div id="triageResult"></div>
+  </div>
+</section>
+
+<section id="zehir" class="tab">
+  <div class="card">
+    <h2>Zehirli madde kontrolü</h2>
+    <p class="small">Bir madde yutulduysa belirti beklemeyin; veteriner kliniğini arayın ve ambalajı/maddeyi yanınıza alın.</p>
+    <label>Maddeyi ara</label><input id="toxinSearch" placeholder="Örn. çikolata, üzüm, zambak" oninput="searchToxins()">
+    <div id="toxinResults"></div>
+  </div>
+</section>
+
+<section id="asi" class="tab">
+  <div class="card">
+    <h2>Aşı ve hatırlatıcılar</h2>
+    <p class="small">Aşı planı türe, yaşa, sağlık durumuna ve bölgeye göre değişir. Takvimi veteriner hekiminizle doğrulayın.</p>
+    <div class="row">
+      <div><label>Aşı / hatırlatma adı</label><input id="vName" placeholder="Örn. Kontrol randevusu"></div>
+      <div><label>Tarih</label><input id="vDate" type="date"></div>
+    </div>
+    <button class="primary" onclick="addVaccine()">Hatırlatıcı ekle</button>
+    <div id="vaccineList"></div>
+  </div>
+</section>
+
+<section id="asistan" class="tab">
+  <div class="card">
+    <h2>Bilgi asistanı</h2>
+    <p class="small">Demo sürümüdür; yanıtlar veteriner tavsiyesi veya teşhis değildir. Acil durumda kliniği arayın.</p>
+    <div id="chat"><div class="msg bot">Merhaba! Evcil hayvan bakımıyla ilgili sorunuzu yazabilirsiniz. Acil belirtilerde doğrudan veteriner hekime başvurun.</div></div>
+    <div class="row">
+      <input id="chatInput" placeholder="Sorunuzu yazın..." onkeydown="if(event.key==='Enter') sendMessage()">
+      <button class="primary" onclick="sendMessage()">Gönder</button>
+    </div>
+  </div>
+</section>
+</main>
+<footer>VetAsistan • Bilgilendirme amaçlıdır; profesyonel veteriner muayenesinin yerine geçmez.</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button,.tab").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");$(b.dataset.tab).classList.add("active");
+});
+
+function saveProfile(){
+  const p={};["ad","tur","irk","yas","kilo","cins","notlar"].forEach(id=>p[id]=$(id).value);
+  localStorage.setItem("vet-profile",JSON.stringify(p));$("saved").textContent=" ✓ Kaydedildi";
+}
+try{const p=JSON.parse(localStorage.getItem("vet-profile")||"{}");Object.keys(p).forEach(k=>{if($(k))$(k).value=p[k]})}catch{}
+
+function checkSymptoms(){
+  const selected=[...document.querySelectorAll("#symptoms input:checked")].map(x=>x.value);
+  const emergency=["Nefes almada güçlük","Bayılma veya tepki vermeme","Nöbet","Yoğun kanama","Zehirli madde yutma şüphesi"];
+  let box=$("triageResult");
+  if(!selected.length){box.innerHTML='<div class="result monitor">Lütfen görülen belirtileri seçin. Durum kötüleşirse veteriner hekime başvurun.</div>';return}
+  if(selected.some(x=>emergency.includes(x))){
+    box.innerHTML='<div class="result urgent"><b>Acil veteriner desteği alın.</b><br>Seçtiğiniz belirtiler acil değerlendirme gerektirebilir. En yakın veteriner kliniğini hemen arayın. Evde ilaç vermeyin ve kusturmaya çalışmayın.</div>';
+  }else if(selected.length>1||selected.includes("Tekrarlayan kusma")){
+    box.innerHTML='<div class="result soon"><b>Bugün veteriner hekime danışın.</b><br>Belirtiler sürüyor, tekrarlıyor veya kötüleşiyorsa muayeneyi geciktirmeyin.</div>';
+  }else{
+    box.innerHTML='<div class="result monitor"><b>Yakından izleyin.</b><br>Belirti devam ederse, tekrarlarsa veya genel durumu bozulursa veteriner hekime başvurun. İnsan ilacı vermeyin.</div>';
+  }
+}
+
+const toxins=[
+  {name:"Çikolata / kakao",risk:"Köpek ve kediler için tehlikeli olabilir; miktar ve tür önemlidir."},
+  {name:"Üzüm / kuru üzüm",risk:"Özellikle köpeklerde ciddi zehirlenmeye yol açabilir."},
+  {name:"Soğan / sarımsak",risk:"Kedi ve köpeklerde zararlı olabilir."},
+  {name:"Ksilitol içeren sakız veya tatlandırıcı",risk:"Köpeklerde acil tehlike oluşturabilir."},
+  {name:"Alkol / kafein",risk:"Evcil hayvanlar için tehlikelidir."},
+  {name:"Zambak",risk:"Kediler için çok tehlikelidir; poleni ve suyu da risk oluşturabilir."},
+  {name:"İnsan ilaçları",risk:"Veteriner önermedikçe vermeyin; bazıları küçük miktarlarda bile tehlikelidir."},
+  {name:"Antifriz",risk:"Çok zehirlidir; temas veya yutma şüphesinde acil kliniği arayın."}
+];
+function searchToxins(){
+  const q=$("toxinSearch").value.trim().toLocaleLowerCase("tr");
+  const matches=toxins.filter(x=>!q||x.name.toLocaleLowerCase("tr").includes(q));
+  $("toxinResults").innerHTML=matches.length?matches.map(x=>`<div class="item"><b>${x.name}</b><br>${x.risk}</div>`).join(""):'<p>Listede bulunamadı. Bu, maddenin güvenli olduğu anlamına gelmez; veteriner hekime danışın.</p>';
+}
+searchToxins();
+
+function getVaccines(){try{return JSON.parse(localStorage.getItem("vet-vaccines")||"[]")}catch{return []}}
+function renderVaccines(){
+  const arr=getVaccines();
+  $("vaccineList").innerHTML=arr.length?arr.map((v,i)=>`<div class="item"><b>${escapeHtml(v.name)}</b> — ${escapeHtml(v.date)} <button onclick="removeVaccine(${i})" style="float:right;color:#b91c1c">Sil</button></div>`).join(""):"<p class='small'>Henüz hatırlatıcı eklenmedi.</p>";
+}
+function addVaccine(){
+  const name=$("vName").value.trim(),date=$("vDate").value;
+  if(!name||!date){alert("Ad ve tarih alanlarını doldurun.");return}
+  const arr=getVaccines();arr.push({name,date});arr.sort((a,b)=>a.date.localeCompare(b.date));
+  localStorage.setItem("vet-vaccines",JSON.stringify(arr));$("vName").value="";$("vDate").value="";renderVaccines();
+}
+function removeVaccine(i){const a=getVaccines();a.splice(i,1);localStorage.setItem("vet-vaccines",JSON.stringify(a));renderVaccines()}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+renderVaccines();
+
+function sendMessage(){
+  const text=$("chatInput").value.trim();if(!text)return;
+  const chat=$("chat");chat.insertAdjacentHTML("beforeend",`<div class="msg user">${escapeHtml(text)}</div>`);
+  $("chatInput").value="";
+  const urgentWords=["nefes alam","nöbet","bayıldı","kanama","zehir","yuttu"];
+  const urgent=urgentWords.some(w=>text.toLocaleLowerCase("tr").includes(w));
+  const reply=urgent
+    ?"Bu durum acil olabilir. Lütfen hemen veteriner kliniğini arayın. Kendi başınıza ilaç vermeyin veya kusturmaya çalışmayın."
+    :"Bu demo sürümü kişiye özel teşhis veremez. Belirti sürüyor ya da kötüleşiyorsa veteriner hekime danışın. Daha iyi değerlendirme için evcil hayvanınızın türünü, yaşını ve belirtilerin ne zamandır sürdüğünü paylaşabilirsiniz.";
+  chat.insertAdjacentHTML("beforeend",`<div class="msg bot">${reply}</div>`);chat.scrollTop=chat.scrollHeight;
+}
+</script>
+</body>
+</html>
